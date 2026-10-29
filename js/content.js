@@ -199,5 +199,5 @@ export const CREDITS = {
     { name: 'Member 3', role: 'Quality assurance and final report' },
   ],
   // Names only what ships: when generated sound or the guide voice lands, it is added here.
-  ai: 'Visuals were generated with AI tools (OpenAI image generation), and the site was built with AI assistance. Research, curation and every source are the group’s own.',
+  ai: 'The pixel reconstructions were generated with AI tools (OpenAI image generation), and the site was built with AI assistance. Original photographs, layout images and videos are credited separately in their galleries and below. Research and curation are the group’s own.',
 };
