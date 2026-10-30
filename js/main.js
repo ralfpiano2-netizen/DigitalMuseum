@@ -1,21 +1,21 @@
 // Boot: render every label and dialog from the content modules, fill asset slots, then drive the
 // HUD, the passport and each stage from the scroll observers.
-import { SITE, ZONES, ARTIFACTS, LOBBY_NOTES, CREDITS } from './content.js';
-import { REFERENCES, TRENDS, CONCLUSION, ARCHIVE, IMPACTS } from './sheet.js';
+import { SITE, ZONES, ARTIFACTS, LOBBY_NOTES, CREDITS } from './content.js?v=exhibit-text-2';
+import { COMPARISONS, DOCUMENT_REFERENCES, DOCUMENT_SCOPE, SYNOPSIS, CLOSING } from './exhibit-text.js?v=exhibit-text-2';
 import { SLOTS } from './slots.js';
 import { loadIndex } from './assets.js';
 import { wallet, passport } from './state.js';
 import { watchSteps, watchSections, watchProgress } from './scroll.js';
 import { placeholder } from './scenes.js';
 import { $, $$, esc, accession, citeText, img, go, reduceMotion, emit } from './ui.js';
-import { mountFeed } from './exhibits/feed.js';
+import { mountFeed } from './exhibits/feed.js?v=exhibit-text-2';
 import { mountTransitions } from './exhibits/transitions.js';
 import { mountTV } from './exhibits/tvguide.js';
 import { mountStreet } from './exhibits/pisonet.js';
 import { mountNokia } from './exhibits/nokia.js';
 import { mountChainText } from './exhibits/chaintext.js';
 import { enable, disable, isOn, sfx, setAmbience, playMusic, playGuide, stopGuide } from './audio.js';
-import { artifactMediaHTML, archiveMediaHTML, mediaCreditsHTML, mountMedia } from './media.js';
+import { artifactMediaHTML, archiveMediaHTML, mediaCreditsHTML, mountMedia } from './media.js?v=exhibit-text-2';
 
 const BY_ID = Object.fromEntries(ARTIFACTS.map(a => [a.id, a]));
 const ZONE_BY_ID = Object.fromEntries(ZONES.map(z => [z.id, z]));
@@ -28,6 +28,33 @@ const LONG = new Set(['ao-05', 'ao-15']);
 
 /* Rendering */
 
+// Link the supplied author–date citations to their source without changing their wording.
+function documentText(text) {
+  const aliases = { 'A. K. S. Ong et al.': 'Ong, A. K.', 'J. C. Ong et al.': 'Ong, J. C., Fallorina',
+    'J. C. Ong & Tapsell': 'Ong, J. C., & Tapsell', 'Messenger & Ghosheh': 'Messenger,',
+    'Anoc & Cruz': 'Anoc,', 'Anarcon & Maglipon': 'Anarcon, J. P., & Maglipon', 'Rico & de Leon': 'Rico,' };
+  return text.split(/(\([^()]*(?:(?:19|20)\d{2}[ab]?|n\.d\.)[^()]*\))/g).map(part => {
+    if (!part.startsWith('(')) return esc(part);
+    return '(' + part.slice(1, -1).split('; ').map(citation => {
+      const match = citation.match(/^(.*), ((?:19|20)\d{2}[ab]?|n\.d\.)$/);
+      if (!match) return esc(citation);
+      const author = match[1], year = match[2];
+      const prefix = aliases[author] || author.replace(/ et al\.$/, '').split(' & ')[0];
+      const ref = DOCUMENT_REFERENCES.find(ref => ref.apa.startsWith(prefix) && ref.apa.includes('(' + year));
+      return ref?.url ? `<a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">${esc(citation)}</a>` : esc(citation);
+    }).join('; ') + ')';
+  }).join('');
+}
+function documentReferencesHTML() {
+  return `<p>${esc(DOCUMENT_SCOPE)}</p><ul class="ref-list">${DOCUMENT_REFERENCES.map(ref => `<li>${ref.url ? `<a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">${esc(ref.apa)}</a>` : esc(ref.apa)}</li>`).join('')}</ul>`;
+}
+function comparisonHTML(c, era = '') {
+  return `<details class="archive-card document-comparison" id="${c.id}"><summary><span>${esc(c.domain)} · ${esc(LENS_LABEL[c.lens])}</span><h3>${esc(c.title)}</h3></summary><div class="comparison-copy"><p>${esc(c.intro)}</p>
+    ${era !== '2020s' ? `<h4>2000s</h4><p>${documentText(c.past)}</p>` : ''}
+    ${era !== '2000s' ? `<h4>2020s</h4><p>${documentText(c.present)}</p>` : ''}
+    <h4>Synthesis</h4><p>${documentText(c.synthesis)}</p></div></details>`;
+}
+
 function stepHTML(a) {
   const no = accession(a);
   const cite = a.cite.length
@@ -38,9 +65,10 @@ function stepHTML(a) {
     <div class="label" data-label="${a.id}">
       <div class="label-head"><span class="label-no">${no}</span><span>${esc(a.when)}, ${esc(a.medium.toLowerCase())}</span></div>
       <h3 id="${a.id}-title">${esc(a.title)}</h3>
-      <p class="label-body">${esc(a.body)}</p>
+      <p class="label-body">${a.comparison ? documentText(a.body) : esc(a.body)}</p>
       <div class="try" data-try="${a.id}"></div>
       ${artifactMediaHTML(a.id)}
+      ${a.comparison ? `<button class="btn btn--plain comparison-button" type="button" data-comparison="${a.comparison}">Read the full comparison & synthesis</button>` : ''}
       ${cite}
       <p class="label-now"><span>Returns in the void as</span> ${esc(a.now.title)}</p>
       <span class="stamp" aria-hidden="true">${no}<br>stamped</span>
@@ -87,45 +115,40 @@ function renderArchive() {
   const chips = (name, values, all) => `<fieldset><legend>${name}</legend>${[all, ...values].map((v, i) =>
     `<label class="chip"><input type="radio" name="${name.toLowerCase()}" value="${i ? v : ''}"${i ? '' : ' checked'}><span>${v}</span></label>`).join('')}</fieldset>`;
   $('#archive-body').innerHTML = `
+    <section class="archive-section document-synopsis"><h3>Always On The Philippine Pop Culture Time Machine</h3>${SYNOPSIS.map(text => `<p>${esc(text)}</p>`).join('')}<p>The 21 comparisons below accompany 18 interactive stops. Three supplemental scenes—Pacquiao fight Sunday, PisoNet and the MP3 player—remain curatorial interpretations outside the supplied exhibit text.</p></section>
     <form class="filters" id="archive-filters">${chips('Domain', DOMAINS, 'All')}${chips('Lens', LENSES, 'All')}${chips('Era', ['2000s', '2020s'], 'Both')}</form>
-    <p class="archive-count" id="archive-count"></p>
-    <div id="archive-media"></div>
+    <p class="archive-count" id="archive-count"></p><div id="archive-media"></div>
     <div class="archive-list" id="archive-list"></div>
-    <section class="archive-section"><h3>Impact of the past on the present</h3>
-      <dl>${IMPACTS.map(i => `<div class="impact"><dt>${i.domain}</dt><dd>${esc(i.text)}</dd></div>`).join('')}</dl></section>
-    <section class="archive-section"><h3>Patterns and trends</h3>
-      ${TRENDS.map(t => `<div class="trend"><h4>${esc(t.title)}</h4><p>${esc(t.body)}</p></div>`).join('')}</section>
-    <section class="archive-section"><h3>References</h3><ul class="ref-list">${REFERENCES.map(r => `<li>${esc(r.apa)}</li>`).join('')}</ul></section>`;
+    <section class="archive-section"><h3>References for the exhibit text</h3>${documentReferencesHTML()}</section>`;
   const form = $('#archive-filters');
   const draw = () => {
     const f = new FormData(form);
     const [d, l, e] = ['domain', 'lens', 'era'].map(k => f.get(k));
-    const rows = ARCHIVE.filter(c => (!d || c.domain === d) && (!l || c.lens === l) && (!e || c.era === e));
+    const rows = COMPARISONS.filter(c => (!d || c.domain === d) && (!l || c.lens === l));
     $('#archive-media').innerHTML = archiveMediaHTML(d, l, e);
-    $('#archive-count').textContent = `${rows.length} of ${ARCHIVE.length} entries`;
-    $('#archive-list').innerHTML = rows.map(c =>
-      `<article class="archive-card"><p>${c.domain}, ${LENS_LABEL[c.lens]}, ${c.era}</p><p>${esc(c.text)}</p></article>`).join('');
+    $('#archive-count').textContent = `${rows.length} of ${COMPARISONS.length} artifact comparisons${e ? ' · ' + e + ' with synthesis' : ''}`;
+    $('#archive-list').innerHTML = rows.map(c => comparisonHTML(c, e)).join('');
   };
   form.addEventListener('change', draw);
   draw();
 }
 
 function renderFinale() {
-  $('#conclusion').textContent = CONCLUSION;
-  $('#impacts').innerHTML = `<dl>${IMPACTS.map(i => `<div class="impact"><dt>${i.domain}</dt><dd>${esc(i.text)}</dd></div>`).join('')}</dl>`;
+  $('#conclusion').textContent = CLOSING[0];
+  $('#impacts').innerHTML = CLOSING.slice(1).map(text => `<p>${esc(text)}</p>`).join('');
   $('#credits').innerHTML = `<h3 id="credits-title">Credits</h3>
     <p class="credit-ai">${esc(SITE.group)}, ${esc(SITE.project)}</p>
     <ul class="credit-list">${CREDITS.members.map(m => `<li>${esc(m.name)}: ${esc(m.role)}</li>`).join('')}</ul>
     <p class="credit-ai">${esc(CREDITS.ai)}</p>${mediaCreditsHTML()}`;
   $('#references').innerHTML = `<h3 id="references-title">References</h3>
-    <ul class="ref-list">${REFERENCES.map(r => `<li>${esc(r.apa)}</li>`).join('')}</ul>`;
+    ${documentReferencesHTML()}`;
   updateFinalePassport();
 }
 
 function updateFinalePassport() {
   const n = passport.count();
   $('#finale-passport').textContent = n === 18
-    ? 'You collected all 18 artifacts. Every one of them still has a descendant on your phone.'
+    ? 'You collected all 18 interactive artifacts. Explore the Archive for all 21 comparisons and their synthesis.'
     : `You collected ${n} of 18 artifacts. The map can take you back to the rest.`;
 }
 
@@ -302,6 +325,16 @@ function wireDialogs() {
   $('#hud-map').addEventListener('click', () => open('map-dialog'));
   $('#hud-passport').addEventListener('click', () => open('passport-dialog'));
   document.addEventListener('click', e => {
+    const comparison = e.target.closest('[data-comparison]');
+    if (comparison) {
+      const form = $('#archive-filters');
+      form.reset();
+      form.dispatchEvent(new Event('change'));
+      open('archive-dialog');
+      document.getElementById(comparison.dataset.comparison).open = true;
+      requestAnimationFrame(() => document.getElementById(comparison.dataset.comparison)?.scrollIntoView({ block: 'start' }));
+      return;
+    }
     const opener = e.target.closest('[data-open]');
     if (opener) { open(opener.dataset.open); return; }
     if (e.target.closest('[data-close]')) { e.target.closest('dialog').close(); return; }

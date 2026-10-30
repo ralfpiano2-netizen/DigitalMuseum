@@ -1004,3 +1004,22 @@ html[data-era="2020"] .hud-clock { font-family: var(--font-ui); animation: clock
   .family.is-dancing .sprite.is-in .pose-a { opacity: 0; }
   .family.is-dancing .sprite.is-in .pose-b { opacity: 1; }
 }
+
+/* Document-based exhibit comparisons stay readable in the Archive and on small screens. */
+.comparison-button { margin-top: 12px; white-space: normal; text-align: left; }
+.document-comparison { scroll-margin-top: 12px; }
+.document-comparison h3 { font: 600 24px/1.2 var(--font-label); margin: 6px 0 12px; }
+.document-comparison h4 { font: 600 16px/1.4 var(--font-label); margin: 18px 0 6px; }
+.document-comparison p, .document-synopsis p { font: 400 16px/1.6 var(--font-label); margin-bottom: 12px; }
+.document-comparison a, .label-body a { text-decoration: underline; text-underline-offset: 2px; }
+#impacts p + p { margin-top: 16px; }
+
+#archive-list { grid-template-columns: minmax(0, 1fr); }
+.document-comparison summary { cursor: pointer; }
+.document-comparison summary > span { font: 500 12px/1.4 var(--font-mono); color: var(--sofa); }
+.document-comparison summary h3 { display: inline; margin-left: 8px; }
+.document-comparison summary > span { display: block; margin-bottom: 6px; }
+.comparison-copy { max-width: 70ch; margin: 18px auto 0; }
+.document-comparison[open] { padding-bottom: 22px; }
+
+.document-comparison .comparison-copy p { font: 400 16px/1.6 var(--font-label); color: var(--label-ink); }

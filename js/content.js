@@ -1,3 +1,4 @@
+import { COMPARISONS } from './exhibit-text.js?v=exhibit-text-2';
 // Museum text: zones, the 18 artifact labels, guide captions, notifications and credits.
 // `cite` holds REFERENCES ids from sheet.js. A label with no listed source carries a
 // "Curatorial note:" instead. Research text that is quoted verbatim lives in sheet.js.
@@ -159,6 +160,47 @@ export const ARTIFACTS = [
     slots: [],
   },
 ];
+
+// Keep the interactive accession numbers stable while using the supplied exhibit text.
+const DOCUMENT_MATCHES = { 'ao-01': 10, 'ao-02': 11, 'ao-03': 11, 'ao-04': 11,
+  'ao-06': 4, 'ao-08': 1, 'ao-09': 3, 'ao-10': 5, 'ao-11': 12, 'ao-12': 18,
+  'ao-13': 2, 'ao-14': 6, 'ao-15': 7, 'ao-16': 2, 'ao-18': 6 };
+const PRESENT_TITLES = { 1: 'Profiles and recommended feeds', 2: 'Group chats and richer mobile media',
+  3: 'Mobile games and social relationships', 4: 'Freelancing and platform work',
+  5: 'Shopping feeds and live selling', 6: 'Digital wallets and payment channels',
+  7: 'Messages, gatherings and sustained participation', 10: 'TikTok choreography and Pantropiko',
+  11: 'Streaming alongside scheduled television', 12: 'Drag, streaming and community',
+  18: 'OPM and contemporary fan communities' };
+for (const a of ARTIFACTS) {
+  const n = DOCUMENT_MATCHES[a.id];
+  if (!n) continue;
+  const comparison = COMPARISONS[n - 1];
+  a.comparison = comparison.id;
+  if (a.id === 'ao-14') a.title = 'Prepaid access card';
+  a.body = comparison.past;
+  if (a.id === 'ao-02') a.body = 'Meteor Garden became a Philippine viewing phenomenon in 2003 (Flores, 2003). Television schedules gave audiences shared references for following its story and stars.';
+  if (a.id === 'ao-03') a.body = "Pangako Sa ’Yo attracted audiences during its original 2000–2002 run (ABS-CBN, 2022; Anarcon & Maglipon, 2020). Following a story meant making room for it in the day’s television schedule.";
+  if (a.id === 'ao-04') a.body = 'StarStruck launched in 2003 (Anarcon, 2019), followed by Pinoy Big Brother in 2005 (Sabio, 2025). Reality formats gave viewers reasons to keep following performers and participants as their stories developed.';
+  if (a.id === 'ao-14') a.body = 'Level Up! prepaid cards gave Ragnarok players paid access to the game (Gokongwei-Cheng, 2003). A scratch card and a code connected physical money with access to a digital world.';
+  if (a.id === 'ao-18') a.body = 'Remittance counters offered ways to move value across distance, including between overseas workers and their families (Torres, 2006). Contemporary reporting described Cebuana Lhuillier expanding its transfer partnerships in 2006 (Torres, 2006).';
+  if (a.id === 'ao-16') a.body = 'Nokia’s 2003 announcement for the 6600 described video clips and local sharing through Bluetooth and infrared (Nokia, 2003). Phones carried media as well as messages, allowing files to pass between nearby handsets.';
+  a.synthesis = comparison.synthesis;
+  a.cite = [];
+  a.note = 'From the supplied museum exhibit text. Full comparison and references in the Archive.';
+  a.now = { title: PRESENT_TITLES[n], body: comparison.present, cite: [] };
+}
+// These three interactive scenes are supplemental to the document's 21 comparisons.
+for (const id of ['ao-05', 'ao-07', 'ao-17']) {
+  const a = ARTIFACTS.find(a => a.id === id);
+  a.cite = [];
+  a.note = 'Supplemental interactive scene: curatorial interpretation, outside the supplied document’s 21 comparisons.';
+}
+ARTIFACTS.find(a => a.id === 'ao-05').now = { title: 'Live events across more screens', body: 'Streaming and clips offer more ways to follow an event. Live broadcasts and shared viewing continue alongside personal feeds.', cite: [] };
+ARTIFACTS.find(a => a.id === 'ao-07').now = { title: 'Mobile access, with continuing limits', body: 'Mobile devices add routes to online activity. Device cost, coverage and connectivity still shape who can participate.', cite: [] };
+ARTIFACTS.find(a => a.id === 'ao-17').now = { title: 'Music across recordings, clips and concerts', body: 'Listeners can share music through more media while continuing to find belonging through songs, performances and fan communities.', cite: [] };
+ZONES[0].intro = 'Television schedules helped organize household routines. Following dramas, performances and personalities gave audiences shared references; scheduled and shared viewing continue alongside on-demand services.';
+ZONES[1].intro = 'Computer shops, malls and community venues brought digital activity and social life into shared physical settings. Newer platforms add routes to participation while these places remain relevant.';
+ZONES[2].intro = 'Prepaid access and keypad phones shaped everyday communication. Messages, local media sharing and remittance services show earlier ways to connect across distance, alongside continuing questions of access and trust.';
 
 // Guide voice lines (Taglish). The ElevenLabs scripts use this text exactly.
 export const GUIDE = {
