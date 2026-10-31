@@ -1,7 +1,7 @@
 // Zone 1, the TV day. A CRT in the sala, a wall clock that spins to each show's hour, the family
 // gathering in front of the set, and the newspaper TV guide that ran the household's schedule.
 import { wallet } from '../state.js';
-import { sfx, playMusic, playSlot } from '../audio.js';
+import { sfx, playMusic, playSlot } from '../audio.js?v=focused-1';
 import { onProgress } from '../scroll.js';
 import { $, $$, img, go, esc } from '../ui.js';
 import { broadcast } from '../scenes.js';

@@ -2,7 +2,7 @@
 // the rewind (2026 back to 2000), the sign-off (the broadcast day ends) and the upgrade
 // (2010 up to 2026). Also the Wing 1 glitter trail.
 import { onProgress } from '../scroll.js';
-import { sfx, playSlot } from '../audio.js';
+import { sfx, playSlot } from '../audio.js?v=focused-1';
 import { asset } from '../assets.js';
 import { placeholder } from '../scenes.js';
 import { $, reduceMotion } from '../ui.js';
@@ -235,7 +235,7 @@ function glitter() {
     raf = sparks.length ? requestAnimationFrame(draw) : 0;
   };
   const spawn = (x, y) => {
-    if (document.documentElement.dataset.era !== '2000' || reduceMotion()) return;
+    if (document.documentElement.dataset.effects !== 'on' || document.documentElement.dataset.era !== '2000' || reduceMotion()) return;
     for (let i = 0; i < 2; i++) {
       sparks.push({
         x: x + (Math.random() - 0.5) * 16, y: y + (Math.random() - 0.5) * 16, fall: 0.3 + Math.random() * 0.6,

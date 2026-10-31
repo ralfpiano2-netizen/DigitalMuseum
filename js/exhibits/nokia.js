@@ -2,7 +2,7 @@
 // scratch-off load card, a 3GP arriving over Bluetooth, one earphone each, and Mama's padala.
 import { multitap, KEYMAP } from '../logic.js';
 import { wallet } from '../state.js';
-import { sfx, playMusic, playSlot } from '../audio.js';
+import { sfx, playMusic, playSlot } from '../audio.js?v=focused-1';
 import { $, $$, esc } from '../ui.js';
 import { person } from '../sprites.js';
 

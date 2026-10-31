@@ -313,7 +313,16 @@ html[data-era="2020"] .hud-clock { font-family: var(--font-ui); animation: clock
 .label-no { color: var(--sofa); font-weight: 500; white-space: nowrap; }
 .label h3 { font: 600 25px/1.12 var(--font-label); letter-spacing: -0.01em; margin: 6px 0 8px; }
 .label-body { font: 400 17px/1.5 var(--font-label); }
-.label-intro .label-body { font-size: 19px; }
+/* Topic introductions use a distinct palette from the cream artifact labels. */
+.label-intro {
+  background: #243f42;
+  color: #f8f1e3;
+  border: 1px solid #567171;
+  border-left: 4px solid #d9be7b;
+}
+.label-intro .label-head { padding-right: 0; color: #cfddd5; }
+.label-intro .label-no { color: #edcf8b; }
+.label-intro .label-body { font-size: 19px; margin-top: 10px; }
 .try { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .try:empty { display: none; }
 .label-cite { margin-top: 12px; font: 400 12px/1.45 var(--font-mono); color: var(--label-dim); }
@@ -457,7 +466,7 @@ html[data-era="2020"] .hud-clock { font-family: var(--font-ui); animation: clock
   font: 400 4cqw/1 var(--font-pixel); color: var(--ink); background: #fff; border: 0.8cqw solid var(--ink);
 }
 
-.tv-guide { margin-top: 14px; padding: 12px 12px 10px; background: #fffaf0; border: 1px solid var(--label-line); }
+.tv-guide { color: #201d19; margin-top: 14px; padding: 12px 12px 10px; background: #fffaf0; border: 1px solid var(--label-line); }
 .tv-guide-head {
   display: flex; justify-content: space-between; padding-bottom: 6px; border-bottom: 2px solid var(--label-ink);
   font: 600 12px/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase;
@@ -1023,3 +1032,75 @@ html[data-era="2020"] .hud-clock { font-family: var(--font-ui); animation: clock
 .document-comparison[open] { padding-bottom: 22px; }
 
 .document-comparison .comparison-copy p { font: 400 16px/1.6 var(--font-label); color: var(--label-ink); }
+
+/* Keep the original rooms and pixel artwork; reveal secondary information on request. */
+#hud-load { display: none !important; }
+html[data-effects="off"] .stamp { display: none; }
+.stamp { right: 4px; transform: rotate(-10deg) scale(1); }
+html[data-effects="off"] :is(.hud-clock, .ps-blink, .profile-name, .pause-btn) { animation: none !important; }
+html[data-effects="off"] .card-media * { animation-play-state: paused !important; }
+html[data-effects="off"] #glitter { visibility: hidden; }
+.label-actions { display: flex; margin-top: 14px; }
+.label-interaction { margin-top: 12px; border-top: 1px solid var(--label-line); padding-top: 10px; }
+.label-interaction summary { cursor: pointer; font: 400 14px/1.5 var(--font-label); text-underline-offset: 3px; }
+.label-interaction[open] summary { color: var(--sofa); }
+.label-interaction .try { margin-top: 10px; }
+.menu-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.artifact-story { max-width: 70ch; margin-inline: auto; }
+.artifact-story h3 { font: 600 25px/1.2 var(--font-label); margin: 26px 0 10px; }
+.artifact-story > p { font: 400 18px/1.65 var(--font-label); margin-bottom: 14px; }
+.artifact-story .story-intro { font: italic 400 21px/1.5 var(--font-label); }
+.artifact-story a { text-decoration: underline; text-underline-offset: 3px; }
+.artifact-story .story-note { font-size: 14px; color: var(--label-dim); margin-top: 18px; }
+.artifact-story .media-preview { margin-block: 24px; }
+.archive-filter-panel { margin: 16px 0; }
+.archive-filter-panel > summary, .document-synopsis > summary, .credits summary, .references summary { cursor: pointer; font: 500 17px/1.5 var(--font-label); }
+.archive-filter-panel[open] > summary, .document-synopsis[open] > summary, .credits details[open] > summary, .references details[open] > summary { margin-bottom: 16px; }
+@media(max-width:480px){.label{padding:14px}.label h3{font-size:24px}.label-body{font-size:16px;line-height:1.5}.artifact-story > p{font-size:17px}.artifact-story .story-intro{font-size:20px}}
+
+/* Large source images are visible immediately, without an enlargement control. */
+.artifact-card-media { float: none; width: 100%; max-width: none; margin: 12px 0 16px; }
+.artifact-card-media img { display: block; width: 100%; height: clamp(220px, 34svh, 340px); object-fit: contain; image-rendering: auto; background: #ece7dc; border: 1px solid var(--label-line); padding: 8px; }
+.artifact-card-media figcaption { font: 400 12px/1.45 var(--font-label); color: var(--label-dim); margin-top: 7px; overflow-wrap: anywhere; }
+.artifact-card-media figcaption > span { display: block; }
+.artifact-card-media figcaption a { text-underline-offset: 2px; }
+.label-actions, .label-interaction { clear: both; }
+@media(max-width:480px){.artifact-card-media img{height:clamp(210px,32svh,290px)}.artifact-card-media figcaption{font-size:12px}}
+
+/* Give the existing card space to the picture instead of expanding the card. */
+.label:has(.artifact-card-media) .label-head > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.label:has(.artifact-card-media) .label-body { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.label:has(.artifact-card-media) .artifact-card-media { margin: 8px 0 10px; }
+.label:has(.artifact-card-media) .artifact-card-media img { height: 230px; padding: 0; border: 0; }
+.label:has(.artifact-card-media) .label-actions { margin-top: 10px; }
+@media(max-width:480px){.label:has(.artifact-card-media) .artifact-card-media img{height:220px}.label:has(.artifact-card-media) h3{margin-bottom:6px}}
+
+/* Supporting clips are visible directly beneath the artifact photograph. */
+.label > .media-figure { border-top: 1px solid var(--label-line); padding: 14px 0; }
+.label > .media-figure h3 { font-size: 20px; }
+.label > .media-figure figcaption > p { font-size: 14px; line-height: 1.45; }
+.label > .media-figure figcaption .media-credit { font-size: 11px; overflow-wrap: anywhere; }
+
+.media-source-gallery { padding: 18px; background: #e8e2d6; border: 1px solid var(--label-line); font: 500 14px/1.5 var(--font-mono); }
+.media-post { min-height: 240px; display: grid; background: #15151b; color: #f6f2e9; }
+.media-post iframe { display: block; width: 100%; height: 520px; border: 0; background: #fff; }
+
+/* Documentary media remains prominent in the present-day feed. */
+.card-media img { object-fit: contain; object-position: center 20%; background: #111117; image-rendering: auto; }
+.card-media::after { background: linear-gradient(to top, rgba(7,7,10,.98) 0%, rgba(7,7,10,.9) 28%, rgba(7,7,10,.08) 70%, rgba(7,7,10,.28) 100%); }
+.card-photo-credit { font: 400 11px/1.4 var(--font-ui); color: #e4e4e9; overflow-wrap: anywhere; }
+.card-photo-credit > span { display: block; font-weight: 600; }
+.card-photo-credit a { color: #e4e4e9; text-decoration: underline; text-underline-offset: 2px; }
+.card-read { color: #fff; justify-self: start; font-size: 12px; padding: 4px 0; }
+.card-photo-unavailable .card-photo-credit::before { content: 'Image unavailable · '; }
+.present-figure { margin: 24px 0; padding: 18px 0; border-top: 1px solid var(--label-line); }
+.present-figure img { display: block; width: 100%; max-height: 420px; object-fit: contain; background: #e8e2d6; }
+.present-figure figcaption { padding-top: 12px; font: 400 14px/1.5 var(--font-label); }
+.present-figure figcaption p { margin: 6px 0; }
+.present-figure a { font-size: 12px; color: #454038; text-underline-offset: 3px; }
+
+.artifact-story .artifact-card-media img { height: 340px; object-fit: contain; }
+.story-sources { margin: 20px 0; font: 400 15px/1.5 var(--font-label); }
+.story-sources summary { cursor: pointer; text-decoration: underline; }
+.story-sources ul { padding-left: 20px; margin-top: 12px; }
+.story-sources li + li { margin-top: 8px; }

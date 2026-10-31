@@ -2,7 +2,7 @@
 // synthesized stand-in (or silence), so the museum sounds right before any recording exists.
 import { asset } from './assets.js';
 import { SLOTS } from './slots.js';
-import { GUIDE } from './content.js?v=exhibit-text-2';
+import { GUIDE } from './content.js?v=focused-10';
 
 let ctx = null;
 let master = null;
@@ -340,7 +340,7 @@ export function stopGuide() {
 // The guide speaks once per stop per visit. The caption shows whether or not sound is on.
 export function playGuide(key) {
   const line = GUIDE[key];
-  if (!line || heard.has(key)) return;
+  if (!on || !line || heard.has(key)) return;
   heard.add(key);
   stopGuide();
   emit('caption', { text: line.caption });

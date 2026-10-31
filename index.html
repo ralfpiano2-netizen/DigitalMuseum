@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-era="2026">
+<html lang="en" data-era="2026" data-effects="off">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,8 +7,8 @@
 <meta name="description" content="A scroll-through museum of Philippine pop culture, from the bounded 2000s to the always-on 2020s. Three zones, eighteen artifacts.">
 <meta name="theme-color" content="#0b0c12">
 <link rel="icon" href="favicon.png" sizes="32x32">
-<link rel="stylesheet" href="css/museum.css?v=exhibit-text-2">
-<script type="module" src="js/main.js?v=exhibit-text-2"></script>
+<link rel="stylesheet" href="css/museum.css?v=focused-10">
+<script type="module" src="js/main.js?v=focused-10"></script>
 </head>
 <body>
 <a class="skip-link" href="#zone-1">Skip to the first zone</a>
@@ -17,9 +17,9 @@
   <p class="hud-clock" id="hud-clock">9:41</p>
   <p class="hud-load" id="hud-load" hidden><span class="hud-word">Load </span><span id="hud-load-value">₱5.00</span></p>
   <div class="hud-actions">
-    <button class="hud-btn" id="hud-passport" type="button" aria-haspopup="dialog"><span class="hud-word">Passport </span><span id="hud-count">0</span>/18</button>
-    <button class="hud-btn" id="hud-map" type="button" aria-haspopup="dialog">Map</button>
-    <button class="hud-btn hud-archive" type="button" aria-haspopup="dialog" data-open="archive-dialog">Archive</button>
+    <button hidden class="hud-btn" id="hud-passport" type="button" aria-haspopup="dialog"><span class="hud-word">Passport </span><span id="hud-count">0</span>/18</button>
+    <button class="hud-btn" id="hud-map" type="button" aria-haspopup="dialog">Menu</button>
+    <button hidden class="hud-btn hud-archive" type="button" aria-haspopup="dialog" data-open="archive-dialog">Archive</button>
     <button class="hud-btn" id="hud-sound" type="button" aria-pressed="false">Sound off</button>
   </div>
 </header>
@@ -42,10 +42,10 @@
           <div><dt>Inside</dt><dd>3 zones, 18 artifacts</dd></div>
         </dl>
         <div class="ticket-actions">
-          <button class="btn btn--ink" id="enter-sound" type="button">Enter with sound</button>
-          <button class="btn btn--plain" id="enter-silent" type="button">Enter without sound</button>
+          <button class="btn btn--ink" id="enter-sound" type="button" hidden>Enter with sound</button>
+          <button class="btn btn--plain" id="enter-silent" type="button">Enter the museum</button>
         </div>
-        <p class="ticket-hint">On iPhone, turn off silent mode to hear it.</p>
+        <p class="ticket-hint">Scroll at your own pace. Sound is optional in the top bar.</p>
       </div>
       <div class="ticket-stub" aria-hidden="true"><span>No.</span><span>0008</span></div>
     </div>
@@ -125,7 +125,7 @@
       </header>
       <div class="feed" id="feed" tabindex="0" aria-label="The always-on feed. Press Pause to leave."></div>
       <div class="toasts" id="toasts" aria-live="polite"></div>
-      <p class="void-timer" id="void-timer">0:00 in the void</p>
+      <p class="void-timer" id="void-timer" hidden>0:00 in the void</p>
       <button class="pause-btn" id="pause-btn" type="button">Pause</button>
     </div>
   </section>
@@ -151,7 +151,7 @@
 <p class="sr-only" data-captions aria-live="polite" lang="fil"></p>
 
 <dialog class="sheet" id="map-dialog" aria-labelledby="map-title">
-  <div class="sheet-head"><h2 id="map-title">Museum map</h2><button class="btn btn--plain" type="button" data-close>Close</button></div>
+  <div class="sheet-head"><h2 id="map-title">Museum menu</h2><button class="btn btn--plain" type="button" data-close>Close</button></div>
   <div class="sheet-body" id="map-body"></div>
 </dialog>
 
@@ -163,6 +163,11 @@
 <dialog class="sheet sheet--wide" id="archive-dialog" aria-labelledby="archive-title">
   <div class="sheet-head"><h2 id="archive-title">The archive</h2><button class="btn btn--plain" type="button" data-close>Close</button></div>
   <div class="sheet-body" id="archive-body"></div>
+</dialog>
+
+<dialog class="sheet sheet--wide" id="artifact-dialog" aria-labelledby="artifact-read-title">
+  <div class="sheet-head"><h2 id="artifact-read-title">Artifact story</h2><button class="btn btn--plain" type="button" data-close>Close</button></div>
+  <div class="sheet-body" id="artifact-read-body"></div>
 </dialog>
 
 <canvas class="glitter" id="glitter" aria-hidden="true"></canvas>

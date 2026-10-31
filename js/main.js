@@ -1,6 +1,7 @@
+import { presentMediaHTML } from './present-media.js?v=focused-10';
 // Boot: render every label and dialog from the content modules, fill asset slots, then drive the
 // HUD, the passport and each stage from the scroll observers.
-import { SITE, ZONES, ARTIFACTS, LOBBY_NOTES, CREDITS } from './content.js?v=exhibit-text-2';
+import { SITE, ZONES, ARTIFACTS, LOBBY_NOTES, CREDITS } from './content.js?v=focused-10';
 import { COMPARISONS, DOCUMENT_REFERENCES, DOCUMENT_SCOPE, SYNOPSIS, CLOSING } from './exhibit-text.js?v=exhibit-text-2';
 import { SLOTS } from './slots.js';
 import { loadIndex } from './assets.js';
@@ -8,14 +9,14 @@ import { wallet, passport } from './state.js';
 import { watchSteps, watchSections, watchProgress } from './scroll.js';
 import { placeholder } from './scenes.js';
 import { $, $$, esc, accession, citeText, img, go, reduceMotion, emit } from './ui.js';
-import { mountFeed } from './exhibits/feed.js?v=exhibit-text-2';
-import { mountTransitions } from './exhibits/transitions.js';
-import { mountTV } from './exhibits/tvguide.js';
-import { mountStreet } from './exhibits/pisonet.js';
-import { mountNokia } from './exhibits/nokia.js';
-import { mountChainText } from './exhibits/chaintext.js';
-import { enable, disable, isOn, sfx, setAmbience, playMusic, playGuide, stopGuide } from './audio.js';
-import { artifactMediaHTML, archiveMediaHTML, mediaCreditsHTML, mountMedia } from './media.js?v=exhibit-text-2';
+import { mountFeed } from './exhibits/feed.js?v=focused-10';
+import { mountTransitions } from './exhibits/transitions.js?v=focused-1';
+import { mountTV } from './exhibits/tvguide.js?v=focused-1';
+import { mountStreet } from './exhibits/pisonet.js?v=focused-1';
+import { mountNokia } from './exhibits/nokia.js?v=focused-1';
+import { mountChainText } from './exhibits/chaintext.js?v=focused-1';
+import { enable, disable, isOn, sfx, setAmbience, playMusic, playGuide, stopGuide } from './audio.js?v=focused-1';
+import { artifactCardMediaHTML, artifactMediaHTML, archiveMediaHTML, mediaCreditsHTML, mountMedia } from './media.js?v=focused-10';
 
 const BY_ID = Object.fromEntries(ARTIFACTS.map(a => [a.id, a]));
 const ZONE_BY_ID = Object.fromEntries(ZONES.map(z => [z.id, z]));
@@ -55,22 +56,55 @@ function comparisonHTML(c, era = '') {
     <h4>Synthesis</h4><p>${documentText(c.synthesis)}</p></div></details>`;
 }
 
+const SHORT_LABELS = {
+  'ao-01': 'SexBomb’s “The Spageti Song” became a dance craze in 2003. Noontime performances made its choreography part of shared entertainment routines (Gloria, 2026).',
+  'ao-02': 'Meteor Garden became a Philippine viewing phenomenon in 2003. Following its story and stars gave audiences shared references within the television schedule (Flores, 2003).',
+  'ao-03': 'Pangako Sa ’Yo attracted audiences during its original 2000–2002 run. Following a story meant making room for it in the day’s television schedule (ABS-CBN, 2022; Anarcon & Maglipon, 2020).',
+  'ao-04': 'StarStruck launched in 2003, followed by Pinoy Big Brother in 2005. Reality formats gave viewers reasons to keep following performers and participants as their stories developed (Anarcon, 2019; Sabio, 2025).',
+  'ao-05': 'On fight Sundays, neighbors gathered around a television to follow Pacquiao’s bouts. This reconstructed scene recalls the shared anticipation of a live broadcast.',
+  'ao-06': 'BPO work connected Philippine workers to international service operations. Night shifts changed local routines around customers elsewhere, raising questions about working hours and conditions (Messenger & Ghosheh, 2010).',
+  'ao-07': 'A coin slot, a monitor, and a few minutes online. This reconstructed PisoNet scene recalls neighborhood access shared, timed, and paid for in small amounts.',
+  'ao-08': 'Friendster gave users a profile to visit and a way to make friendship visible. Internet cafés provided access for people without convenient connections at home (DigitalFilipino, 2007; Glasner, 2005).',
+  'ao-09': 'Computer shops combined digital play with company in the same room. Students gathered to play Ragnarok Online; Netopia and neighborhood cafés also offered research and social networking (Gokongwei-Cheng, 2003; Limos, 2021).',
+  'ao-10': 'Mall of Asia opened in 2006 and TriNoma in 2007. Shopping, food, and shared leisure met in a physical destination, with participation shaped by commercial power and unequal access (GMANews.TV, 2007b; Rico & de Leon, 2017).',
+  'ao-11': 'Salons and local pageants frame this comparison of space and queer expression. Cabalfin’s 2000 publication is verified through a catalog; claims about these particular venues remain curatorial questions, with safety and acceptance varying by setting (Cabalfin, 2000).',
+  'ao-12': 'Kamikazee and Sponge Cola were part of the decade’s band culture. Both appeared in the 2006 Kami nAPO Muna tribute project, a record of their presence in the music scene (The Philippine Star, 2006).',
+  'ao-13': 'Prepaid access and relatively affordable SMS helped make mobile conversation familiar. Texting developed its own shorthand and etiquette, while cost still shaped how messages were exchanged (Lichauco, 2001).',
+  'ao-14': 'Scratch a card and enter a code: physical money became digital access. Level Up! prepaid cards gave Ragnarok players paid access to the game (Gokongwei-Cheng, 2003).',
+  'ao-15': 'During EDSA II in January 2001, SMS circulated information and calls to assemble. Rafael examines the phone together with the crowd, including class assumptions about political participation (Rafael, 2003).',
+  'ao-16': 'Phones carried media as well as messages. Nokia’s 2003 announcement for the 6600 documented video clips and local sharing through Bluetooth and infrared (Nokia, 2003).',
+  'ao-17': 'Two people, one player, one earphone each. This reconstructed scene recalls music as something people carried and shared with someone beside them.',
+  'ao-18': 'Remittance counters connected money sent across distance with families at home. Reporting described Cebuana Lhuillier expanding its transfer partnerships in 2006 (Torres, 2006).',
+};
+
+function detailedStoryHTML(details) {
+  const paragraphs = list => list.map(text => `<p>${esc(text)}</p>`).join('');
+  return `<p class="story-intro">${esc(details.intro)}</p><h3>2000s · Carrying a music collection</h3>${paragraphs(details.past)}<h3>2020s · Discovery, sharing, and gathering</h3>${paragraphs(details.present)}<h3>What connects them</h3><p>${esc(details.connection)}</p><details class="story-sources"><summary>Sources for this comparison</summary><ul>${details.sources.map(source => `<li><a href="${esc(source.url)}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a></li>`).join('')}</ul></details>`;
+}
+
+function renderArtifactStory(a) {
+  const c = COMPARISONS.find(c => c.id === a.comparison);
+  $('#artifact-read-title').textContent = a.title;
+  $('#artifact-read-body').innerHTML = `<article class="artifact-story">
+    ${a.details ? detailedStoryHTML(a.details) : c ? `<p class="story-intro">${esc(c.intro)}</p><h3>2000s</h3><p>${documentText(c.past)}</p><h3>2020s</h3><p>${documentText(c.present)}</p><h3>What connects them</h3><p>${documentText(c.synthesis)}</p>` : `<p>${esc(a.body)}</p><h3>2020s</h3><p>${esc(a.now.body)}</p><p class="label-cite is-note">${esc(a.note)}</p>`}
+    ${a.details ? artifactCardMediaHTML(a.id) : artifactMediaHTML(a.id)}
+    <h3>Present-day visual</h3>${presentMediaHTML(a.id)}
+    ${c ? '<p class="story-note">Author–date links open the supporting sources. The Archive contains all 21 comparisons and the full reference list.</p>' : ''}
+    <button class="btn btn--plain" type="button" data-open="archive-dialog">Explore all 21 comparisons</button></article>`;
+}
+
 function stepHTML(a) {
   const no = accession(a);
-  const cite = a.cite.length
-    ? `<p class="label-cite">${esc(citeText(a.cite))}</p>`
-    : `<p class="label-cite is-note">${esc(a.note)}</p>`;
   const long = LONG.has(a.id);
   return `<article class="step${long ? ' is-long' : ''}"${long ? ' data-progress' : ''} id="${a.id}" data-step="${a.id}" aria-labelledby="${a.id}-title">
     <div class="label" data-label="${a.id}">
       <div class="label-head"><span class="label-no">${no}</span><span>${esc(a.when)}, ${esc(a.medium.toLowerCase())}</span></div>
       <h3 id="${a.id}-title">${esc(a.title)}</h3>
-      <p class="label-body">${a.comparison ? documentText(a.body) : esc(a.body)}</p>
-      <div class="try" data-try="${a.id}"></div>
-      ${artifactMediaHTML(a.id)}
-      ${a.comparison ? `<button class="btn btn--plain comparison-button" type="button" data-comparison="${a.comparison}">Read the full comparison & synthesis</button>` : ''}
-      ${cite}
-      <p class="label-now"><span>Returns in the void as</span> ${esc(a.now.title)}</p>
+      ${artifactCardMediaHTML(a.id)}
+      <p class="label-body">${documentText(SHORT_LABELS[a.id] || a.body)}</p>
+      <div class="label-actions"><button class="btn btn--small" type="button" data-read-artifact="${a.id}" aria-haspopup="dialog">Read more</button></div>
+      <details class="label-interaction" hidden><summary>Try the exhibit</summary><div class="try" data-try="${a.id}"></div></details>
+      ${!a.comparison ? '<p class="label-cite is-note">Supplemental curatorial scene</p>' : ''}
       <span class="stamp" aria-hidden="true">${no}<br>stamped</span>
     </div>
   </article>`;
@@ -79,7 +113,7 @@ function stepHTML(a) {
 function renderSteps() {
   for (const z of ZONES) {
     const intro = `<article class="step" data-step="${z.id}">
-      <div class="label label-intro" role="group" aria-label="Zone ${z.n}, ${esc(z.title)}"><div class="label-head"><span class="label-no">Zone ${z.n}</span><span>${esc(SITE.wing2000)}</span></div>
+      <div class="label label-intro" role="group" aria-label="Zone ${z.n} introduction, ${esc(z.title)}"><div class="label-head"><span class="label-no">Zone ${z.n}</span><span>Zone introduction</span></div>
       <p class="label-body">${esc(z.intro)}</p></div></article>`;
     $(`[data-zone-steps="${z.n}"]`).innerHTML = intro + ARTIFACTS.filter(a => a.zone === z.n).map(stepHTML).join('');
   }
@@ -97,7 +131,7 @@ function renderMap() {
     <div class="map-wing"><h3>Wing 2, the 2020s</h3>
       <a class="map-stop" href="#void"><strong>${esc(SITE.wing2020)}</strong><small>One endless feed</small></a>
       <a class="map-stop" href="#pause"><strong>Your pause</strong><small>Conclusion, credits and references</small></a></div>
-    <div class="map-wing"><button class="btn" type="button" data-open="archive-dialog">Open the archive</button></div>`;
+    <div class="map-wing menu-tools"><button class="btn" type="button" data-open="passport-dialog">Your passport</button><button class="btn" type="button" data-open="archive-dialog">All 21 comparisons & references</button><button class="btn btn--plain" id="extra-effects" type="button" aria-pressed="false">Extra effects: off</button></div>`;
 }
 
 function markMap() {
@@ -115,8 +149,8 @@ function renderArchive() {
   const chips = (name, values, all) => `<fieldset><legend>${name}</legend>${[all, ...values].map((v, i) =>
     `<label class="chip"><input type="radio" name="${name.toLowerCase()}" value="${i ? v : ''}"${i ? '' : ' checked'}><span>${v}</span></label>`).join('')}</fieldset>`;
   $('#archive-body').innerHTML = `
-    <section class="archive-section document-synopsis"><h3>Always On The Philippine Pop Culture Time Machine</h3>${SYNOPSIS.map(text => `<p>${esc(text)}</p>`).join('')}<p>The 21 comparisons below accompany 18 interactive stops. Three supplemental scenes—Pacquiao fight Sunday, PisoNet and the MP3 player—remain curatorial interpretations outside the supplied exhibit text.</p></section>
-    <form class="filters" id="archive-filters">${chips('Domain', DOMAINS, 'All')}${chips('Lens', LENSES, 'All')}${chips('Era', ['2000s', '2020s'], 'Both')}</form>
+    <details class="archive-section document-synopsis"><summary>About the 21 comparisons</summary>${SYNOPSIS.map(text => `<p>${esc(text)}</p>`).join('')}<p>The 21 comparisons below accompany 18 interactive stops. Three supplemental scenes—Pacquiao fight Sunday, PisoNet and the MP3 player—remain curatorial interpretations outside the supplied exhibit text.</p></details>
+    <details class="archive-filter-panel"><summary>Filter comparisons</summary><form class="filters" id="archive-filters">${chips('Domain', DOMAINS, 'All')}${chips('Lens', LENSES, 'All')}${chips('Era', ['2000s', '2020s'], 'Both')}</form></details>
     <p class="archive-count" id="archive-count"></p><div id="archive-media"></div>
     <div class="archive-list" id="archive-list"></div>
     <section class="archive-section"><h3>References for the exhibit text</h3>${documentReferencesHTML()}</section>`;
@@ -136,12 +170,12 @@ function renderArchive() {
 function renderFinale() {
   $('#conclusion').textContent = CLOSING[0];
   $('#impacts').innerHTML = CLOSING.slice(1).map(text => `<p>${esc(text)}</p>`).join('');
-  $('#credits').innerHTML = `<h3 id="credits-title">Credits</h3>
+  $('#credits').innerHTML = `<details><summary id="credits-title">Credits & media sources</summary>
     <p class="credit-ai">${esc(SITE.group)}, ${esc(SITE.project)}</p>
     <ul class="credit-list">${CREDITS.members.map(m => `<li>${esc(m.name)}: ${esc(m.role)}</li>`).join('')}</ul>
-    <p class="credit-ai">${esc(CREDITS.ai)}</p>${mediaCreditsHTML()}`;
-  $('#references').innerHTML = `<h3 id="references-title">References</h3>
-    ${documentReferencesHTML()}`;
+    <p class="credit-ai">${esc(CREDITS.ai)}</p>${mediaCreditsHTML()}</details>`;
+  $('#references').innerHTML = `<details><summary id="references-title">References & research notes</summary>
+    ${documentReferencesHTML()}</details>`;
   updateFinalePassport();
 }
 
@@ -171,14 +205,7 @@ const clockNow = () => new Date().toLocaleTimeString('en-PH', { hour: 'numeric',
 
 function lobby() {
   $('#lock-date').textContent = new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' });
-  const list = $('#lock-notes');
-  LOBBY_NOTES.forEach((n, i) => setTimeout(() => {
-    const li = document.createElement('li');
-    li.className = 'lock-note';
-    li.innerHTML = `<i class="app-tile" style="--tile:${TILE[n.app] ?? '#555'}"></i><span><b>${esc(n.app)}</b>${esc(n.text)}</span><time>now</time>`;
-    list.prepend(li);
-    while (list.children.length > 3) list.lastElementChild.remove();
-  }, reduceMotion() ? 0 : 600 + i * 1100));
+  $('#lock-notes').replaceChildren();
 }
 
 // A gentle auto-scroll from the ticket through the rewind. Any input from the visitor stops it
@@ -325,6 +352,22 @@ function wireDialogs() {
   $('#hud-map').addEventListener('click', () => open('map-dialog'));
   $('#hud-passport').addEventListener('click', () => open('passport-dialog'));
   document.addEventListener('click', e => {
+    const reader = e.target.closest('[data-read-artifact]');
+    if (reader) {
+      renderArtifactStory(BY_ID[reader.dataset.readArtifact]);
+      open('artifact-dialog');
+      $('#artifact-read-body').scrollTop = 0;
+      return;
+    }
+    const effects = e.target.closest('#extra-effects');
+    if (effects) {
+      const enabled = document.documentElement.dataset.effects !== 'on';
+      document.documentElement.dataset.effects = enabled ? 'on' : 'off';
+      effects.setAttribute('aria-pressed', String(enabled));
+      effects.textContent = `Extra effects: ${enabled ? 'on' : 'off'}`;
+      emit('effects:change', { enabled });
+      return;
+    }
     const comparison = e.target.closest('[data-comparison]');
     if (comparison) {
       const form = $('#archive-filters');
@@ -351,8 +394,8 @@ function wireDialogs() {
 function wireTicket() {
   const enter = () => {
     $('.ticket').classList.add('is-torn');
-    playGuide('lobby');
-    glide($('#zone-1'));
+    if (isOn()) playGuide('lobby');
+    glide($('#zone-1'), 1800);
   };
   // Not awaited: on iOS the resume can stay pending, and the visit must start regardless.
   $('#enter-sound').addEventListener('click', () => { enable(); enter(); });
@@ -374,8 +417,9 @@ function wireSound() {
     button.setAttribute('aria-pressed', String(detail.on));
     button.textContent = detail.on ? 'Sound on' : 'Sound off';
     root.classList.toggle('sound-on', detail.on);
-    if (!detail.on) return;
+    if (!detail.on) { stopGuide(); return; }
     setAmbience(beds);
+    if (GUIDED.has(root.dataset.stop)) playGuide(root.dataset.stop);
     if (STOP_MUSIC[root.dataset.stop]) playMusic(STOP_MUSIC[root.dataset.stop]);
   });
   document.addEventListener('section:enter', ({ detail: { id } }) => {
@@ -383,14 +427,14 @@ function wireSound() {
     beds = id === 'zone-2' ? streetBed() : AMBIENCE[id] ?? [];
     setAmbience(beds);
     playMusic(id === 'void' ? 'music-void' : null);
-    if (GUIDED.has(id)) playGuide(id);
+    if (isOn() && GUIDED.has(id)) playGuide(id);
   });
   document.addEventListener('step:enter', ({ detail: { zone } }) => {
     if (zone !== 2) return;
     beds = streetBed();
     setAmbience(beds);
   });
-  document.addEventListener('stamp', () => { sfx.stamp(); sfx.vibrate(15); });
+  document.addEventListener('stamp', () => { if (document.documentElement.dataset.effects === 'on') { sfx.stamp(); sfx.vibrate(15); } });
   // The bar shows the caption; an always-rendered region outside it announces it.
   const bar = $('#caption');
   const live = $('[data-captions]');
@@ -421,6 +465,7 @@ async function boot() {
   mountStreet($('#zone-2'));
   mountNokia($('#zone-3'));
   mountChainText($('#zone-3'));
+  for (const row of $$('.try')) row.closest('.label-interaction').hidden = row.childElementCount === 0;
   for (const z of ZONES) activate($(`#${z.id}`), z.id);
   lobby();
   setClock(null);

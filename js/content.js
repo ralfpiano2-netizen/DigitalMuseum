@@ -202,6 +202,35 @@ ZONES[0].intro = 'Television schedules helped organize household routines. Follo
 ZONES[1].intro = 'Computer shops, malls and community venues brought digital activity and social life into shared physical settings. Newer platforms add routes to participation while these places remain relevant.';
 ZONES[2].intro = 'Prepaid access and keypad phones shaped everyday communication. Messages, local media sharing and remittance services show earlier ways to connect across distance, alongside continuing questions of access and trust.';
 
+ARTIFACTS.find(a => a.id === 'ao-17').details = {
+  "intro": "A portable music player made a chosen collection of songs available away from the computer. This reconstructed scene asks what changed when two people shared one device—and what continues when music moves through streaming, clips, and concerts.",
+  "past": [
+    "A listener first needed music on the player. Apple’s September 2005 iPod nano announcement described synchronizing a computer’s music collection over USB. Its advertised capacities were up to 500 songs for the 2 GB model and 1,000 for the 4 GB model, under stated encoding assumptions. Storage and preparation shaped what someone could carry; capacity varied across devices (Apple, 2005).",
+    "The wired earphones in this scene connect two listeners to the same playback position. Choosing a song, handing over one earbud, or waiting for the other person to finish becomes part of the encounter. This is a curatorial reconstruction of a possible shared-listening moment, rather than interview evidence that every Filipino listener used a player this way.",
+    "The photograph is a reference image of a fourth-generation iPod nano dated 2009. It is a different model from the 2005 launch example above and does not document the inexpensive generic player imagined in the scene."
+  ],
+  "present": [
+    "In the 2020s, discovery can begin in a playlist as well as with a file someone transfers. Spotify’s November 2024 Philippine anniversary report described its Pinoy Music hub, with playlists such as Tatak Pinoy, KALYE, P-Pop on the Rise, and OPM selections organized by decade. These categories offer different routes into local music (Spotify, 2024).",
+    "A song can also reach someone through a short video. TikTok’s Philippine year-end report for 2024 highlighted artists including Lola Amour, Denise Julia, Toneejay, and Maki in its discussion of music discovery. Such platform reports describe their own services; they do not measure every Filipino listener’s habits (TikTok, 2024).",
+    "Listening still reaches beyond an individual screen. Spotify’s 2024 Philippine anniversary event included live performances by Ben&Ben, Moira Dela Torre, and Maki. A person might encounter a track through a playlist and later join other listeners at a performance. Streaming and gathering can coexist (Spotify, 2024)."
+  ],
+  "connection": "The comparison is about how people choose and share music. One player ties a shared moment to a device, a prepared library, and physical proximity. Networked services add playlists, recommendations, and clips that travel between people in different places. Neither arrangement determines whether listening feels solitary or social: the connection depends on what listeners do with the music.",
+  "sources": [
+    {
+      "title": "Apple (2005), Apple Introduces iPod nano",
+      "url": "https://www.apple.com/ie/newsroom/2005/09/07Apple-Introduces-iPod-nano/"
+    },
+    {
+      "title": "Spotify (2024), Celebrating 10 Years of Spotify in the Philippines",
+      "url": "https://newsroom.spotify.com/2024-11-01/philippines-10-year-anniversary-ben-and-ben/"
+    },
+    {
+      "title": "TikTok (2024), Year on TikTok: Philippines",
+      "url": "https://newsroom.tiktok.com/year-on-tiktok-2024-philippines?lang=en-PH"
+    }
+  ]
+};
+
 // Guide voice lines (Taglish). The ElevenLabs scripts use this text exactly.
 export const GUIDE = {
   lobby: { slot: 'voice-lobby', caption: 'Welcome sa Always-On. Museum ito ng isang dekada: ang 2000s, noong may oras pa ang lahat. May schedule ang TV, may load ang cellphone, may timer ang PisoNet. Mag-scroll ka, at babalik tayo sa 2005.' },

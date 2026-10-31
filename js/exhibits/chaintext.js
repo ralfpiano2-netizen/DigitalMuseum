@@ -1,7 +1,7 @@
 // AO-15: "Go 2 EDSA. Wear blck." spreads phone to phone, three contacts at a time, until the
 // phones gather into the crowd at the shrine. Scroll drives it; "Forward" pushes it a hop ahead.
 import { onProgress } from '../scroll.js';
-import { sfx } from '../audio.js';
+import { sfx } from '../audio.js?v=focused-1';
 import { $ } from '../ui.js';
 
 const COUNT = 54;

@@ -1,9 +1,10 @@
+import { PRESENT_IMAGES, PRESENT_MEDIA } from '../present-media.js?v=focused-10';
 // The 2020s void: one endless feed where every 2000s artifact returns as its descendant. The feed
 // times how long the visitor lingers on each zone and leans the next cards that way. Nothing is
 // stored or sent; the "algorithm" lives in this tab. The only way out is Pause.
-import { ARTIFACTS, ZONES, VOID_NOTES } from '../content.js?v=exhibit-text-2';
+import { ARTIFACTS, ZONES, VOID_NOTES } from '../content.js?v=focused-10';
 import { pickNext } from '../logic.js';
-import { sfx, setAmbience, playMusic, isOn } from '../audio.js';
+import { sfx, setAmbience, playMusic, isOn } from '../audio.js?v=focused-1';
 import { $, esc, accession, citeText, img, go, reduceMotion } from '../ui.js';
 import { broadcast } from '../scenes.js';
 
@@ -64,8 +65,32 @@ export function cardEl(a, why = '') {
     <p class="card-cite">${esc(citeText(a.now.cite))}</p>
     <div class="card-rail" aria-hidden="true"><span><b></b>${count((a.n * 37) % 90 + 12)}</span><span><b></b>${count((a.n * 13) % 9 + 2)}</span><span><b></b>Share</span></div>`;
   const media = $('.card-media', el);
-  const still = STILL[a.id] && img(STILL[a.id]);
-  if (still) media.append(still); else media.innerHTML = VISUAL[a.id] ?? '';
+  const item = PRESENT_IMAGES[PRESENT_MEDIA[a.id]];
+  if (item) {
+    const picture = document.createElement('img');
+    picture.src = item.src;
+    picture.alt = item.alt;
+    picture.loading = 'lazy';
+    picture.decoding = 'async';
+    picture.addEventListener('error', () => {
+      media.innerHTML = VISUAL[a.id] ?? '';
+      el.classList.add('card-photo-unavailable');
+    }, { once: true });
+    media.append(picture);
+    const credit = document.createElement('p');
+    credit.className = 'card-photo-credit';
+    credit.innerHTML = `<span>${esc(item.title)}</span><a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">${esc(item.credit)} · source ↗</a>${item.license ? ` · <a href="${esc(item.licenseUrl)}" target="_blank" rel="noopener noreferrer">${esc(item.license)}</a>` : ''}`;
+    el.append(credit);
+  } else {
+    const still = STILL[a.id] && img(STILL[a.id]);
+    if (still) media.append(still); else media.innerHTML = VISUAL[a.id] ?? '';
+  }
+  const reader = document.createElement('button');
+  reader.type = 'button';
+  reader.className = 'btn btn--plain card-read';
+  reader.dataset.readArtifact = a.id;
+  reader.textContent = 'Read the comparison';
+  el.append(reader);
   return el;
 }
 
@@ -93,7 +118,7 @@ export function mountFeed(voidEl) {
     const el = cardEl(a, why);
     feed.insertBefore(el, sentinel);
     // SMIL ignores the reduced-motion stylesheet, so the rider map's dots are paused by hand.
-    if (reduceMotion()) for (const svg of el.querySelectorAll('svg')) svg.pauseAnimations();
+    if (reduceMotion() || document.documentElement.dataset.effects !== 'on') for (const svg of el.querySelectorAll('svg')) svg.pauseAnimations();
     watch.observe(el);
     recent.push(a.id);
     if (recent.length > 4) recent.shift();
@@ -148,6 +173,8 @@ export function mountFeed(voidEl) {
   const enter = () => {
     if (inVoid) return;
     inVoid = true;
+    if (document.documentElement.dataset.effects !== 'on') return;
+    timerEl.hidden = false;
     toastTimer = setTimeout(toast, 2500);
     tick = setInterval(() => {
       seconds++;
@@ -160,8 +187,16 @@ export function mountFeed(voidEl) {
     inVoid = false;
     clearTimeout(toastTimer);
     clearInterval(tick);
+    timerEl.hidden = true;
+    pauseBtn.classList.remove('is-nudging');
     toasts.replaceChildren();
   };
+  document.addEventListener('effects:change', ({ detail }) => {
+    for (const svg of feed.querySelectorAll('svg')) {
+      if (detail.enabled && !reduceMotion()) svg.unpauseAnimations(); else svg.pauseAnimations();
+    }
+    if (document.documentElement.dataset.stop === 'void') { leave(); enter(); }
+  });
   document.addEventListener('section:enter', ({ detail }) => {
     if (detail.id === 'void') enter(); else leave();
     if (detail.id === 'pause') setTimeout(() => { if (isOn() && document.documentElement.dataset.stop === 'pause') playMusic('music-finale'); }, 3000);
